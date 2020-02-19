@@ -18,7 +18,6 @@ public class Server {
                 Socket clientSocket = serverSocket.accept();    //ждем подключения клиента
                 ServerClientThread serverClientThread = new ServerClientThread(clientSocket);   //передаём подключение в другой потом и ждем следующего клиента
                 serverClientThread.start();
-                serverClientThread.setDaemon(true);
             }
         } catch (IOException e) {
             ConsoleHelper.writeMessage("Неизвестная ошибка создания сервера");

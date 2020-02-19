@@ -3,6 +3,7 @@ package client;
 import server.Connection;
 import server.ConsoleHelper;
 import server.Message;
+import server.MessageType;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -40,14 +41,14 @@ public class Client {
     private void run() {
         try (Connection connection = new Connection(socket)) {
             ConsoleHelper.writeMessage("Соединение установлено");
+            ClientReceiveThread clientReceiveThread = new ClientReceiveThread(connection);
+            clientReceiveThread.start();
             while (true) {
-                Message message = connection.receiveMessage();
-                connection.sendMessage();
+                String message = ConsoleHelper.readMessage();
+                connection.sendMessage(new Message(message, MessageType.TEXT));
             }
         } catch (IOException e) {
             ConsoleHelper.writeMessage("Соединение не установлено");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
         }
     }
 }

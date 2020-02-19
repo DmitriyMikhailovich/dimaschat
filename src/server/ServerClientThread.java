@@ -7,6 +7,7 @@ public class ServerClientThread extends Thread {
     private Socket socket;
     public ServerClientThread (Socket clientSocket) {
         this.socket = clientSocket;
+        setDaemon(true);
     }
 
     @Override
