@@ -29,6 +29,7 @@ public class Server {
     protected void sendBroadcastMessage (Message message) throws IOException {
         for (Connection connection: mapAllConnections.values()) {
             connection.sendMessage(message);
+            ConsoleHelper.writeMessage(message.getMessage());
         }
     }
 

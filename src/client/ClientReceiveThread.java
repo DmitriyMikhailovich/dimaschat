@@ -10,7 +10,7 @@ import java.io.IOException;
 public class ClientReceiveThread extends Thread {
     private Connection connection;
 
-    public ClientReceiveThread(Connection connection) {
+    ClientReceiveThread(Connection connection) {
         this.connection = connection;
         setDaemon(true);
     }
@@ -24,7 +24,7 @@ public class ClientReceiveThread extends Thread {
                     ConsoleHelper.writeMessage(message.getMessage());
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
