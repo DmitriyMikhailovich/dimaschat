@@ -5,7 +5,8 @@ import java.net.Socket;
 
 public class ServerClientThread extends Thread {
     private Socket socket;
-    public ServerClientThread (Socket clientSocket) {
+    private Server server;
+     ServerClientThread(Socket clientSocket, Server server) {
         this.socket = clientSocket;
         setDaemon(true);
     }
@@ -15,10 +16,11 @@ public class ServerClientThread extends Thread {
         ConsoleHelper.writeMessage("Установлено соединение с сервером");
 
         try (Connection connection = new Connection(socket)) {
+            server.mapAllConnections.put("dsds", connection);
             while(true) {
                 Message message = connection.receiveMessage();
                 if (message.getMessageType() == MessageType.TEXT) {
-                    ConsoleHelper.writeMessage(message.getMessage());
+                    server.sendBroadcastMessage(message);
                 }
             }
         } catch (IOException e) {
