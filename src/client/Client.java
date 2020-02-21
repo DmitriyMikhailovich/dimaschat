@@ -43,6 +43,7 @@ public class Client {
             ConsoleHelper.writeMessage("Соединение установлено");
             ClientReceiveThread clientReceiveThread = new ClientReceiveThread(connection);
             clientReceiveThread.start();
+            registrationClientToServer(connection);
             while (true) {
                 String message = ConsoleHelper.readMessage();
                 connection.sendMessage(new Message(message, MessageType.TEXT));
@@ -50,5 +51,9 @@ public class Client {
         } catch (IOException e) {
             ConsoleHelper.writeMessage("Соединение не установлено");
         }
+    }
+
+    private void registrationClientToServer(Connection connection) {
+
     }
 }

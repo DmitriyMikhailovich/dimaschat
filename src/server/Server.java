@@ -33,5 +33,22 @@ public class Server {
         }
     }
 
+    protected void registrationUser (Connection connection) throws IOException, ClassNotFoundException {
+        connection.sendMessage(new Message("Введите имя пользователя: "));
+        Message message = connection.receiveMessage();
+        String name;
+        if ((name = message.getMessage()) != null && message.getMessageType() == MessageType.SERVICE) {
+            while (true) {
+                if (mapAllConnections.get(name) == null) {
+                    mapAllConnections.put(name, connection);
+                    return;
+                } else {
+                    connection.sendMessage(new Message("Данное имя занято, введите другое:"));
+                }
+            }
+        }
+
+    }
+
 
 }
