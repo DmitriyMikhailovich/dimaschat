@@ -13,6 +13,7 @@ public class Client {
     private int portServer;
     private Socket socket;
     private String name;
+    protected boolean connected = false;
 
     public static void main(String[] args) {
         Client client = new Client();
@@ -41,19 +42,29 @@ public class Client {
     private void run() {
         try (Connection connection = new Connection(socket)) {
             ConsoleHelper.writeMessage("Соединение установлено");
-            ClientReceiveThread clientReceiveThread = new ClientReceiveThread(connection);
+            ClientReceiveThread clientReceiveThread = new ClientReceiveThread(connection, this);
             clientReceiveThread.start();
-            registrationClientToServer(connection);
+            try {
+                while (!connected) {
+                    Thread.currentThread().sleep(1);
+                }
+            } catch (InterruptedException e) {
+                ConsoleHelper.writeMessage("Ошибка");
+                return;
+            }
             while (true) {
                 String message = ConsoleHelper.readMessage();
-                connection.sendMessage(new Message(message, MessageType.TEXT));
+                connection.sendMessage(new Message(name + ": " + message, MessageType.TEXT));
             }
         } catch (IOException e) {
             ConsoleHelper.writeMessage("Соединение не установлено");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    private void registrationClientToServer(Connection connection) {
 
+    public void setName(String name) {
+        this.name = name;
     }
 }

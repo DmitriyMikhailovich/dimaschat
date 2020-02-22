@@ -2,5 +2,6 @@ package server;
 
 public enum MessageType {
     TEXT,
-    SERVICE
+    USER_REGISTRATION_SUCCESSFUL,
+    USER_REGISTRATION
 }
