@@ -46,7 +46,7 @@ public class Client {
             clientReceiveThread.start();
             try {
                 while (!connected) {
-                    Thread.currentThread().sleep(1);
+                    Thread.sleep(1);
                 }
             } catch (InterruptedException e) {
                 ConsoleHelper.writeMessage("Ошибка");
@@ -54,8 +54,12 @@ public class Client {
             }
             while (true) {
                 String message = ConsoleHelper.readMessage();
+                if (message.equals("exit")) {
+                    break;
+                }
                 connection.sendMessage(new Message(name + ": " + message, MessageType.TEXT));
             }
+            disconnect();
         } catch (IOException e) {
             ConsoleHelper.writeMessage("Соединение не установлено");
         } catch (Exception e) {
@@ -66,5 +70,9 @@ public class Client {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    private void disconnect() {
+        ConsoleHelper.writeMessage("Соединение с сервером разорвано");
     }
 }

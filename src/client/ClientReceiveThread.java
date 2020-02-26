@@ -1,6 +1,9 @@
 package client;
 
-import server.*;
+import server.Connection;
+import server.ConsoleHelper;
+import server.Message;
+import server.MessageType;
 
 import java.io.IOException;
 
@@ -29,13 +32,15 @@ public class ClientReceiveThread extends Thread {
                     registrationClientToServer(connection);
                 }
                 if (message.getMessageType() == MessageType.USER_REGISTRATION_SUCCESSFUL) {
-                        client.connected = true;
-                        client.setName(name);
+                    client.connected = true;
+                    client.setName(name);
+                    ConsoleHelper.writeMessage(message.getMessage());
                 }
             } catch (IOException e) {
                 ConsoleHelper.writeMessage("Ошибка соединения");
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
+                ConsoleHelper.writeMessage("Ошибка соединения, ClassNotFoundException");
                 e.printStackTrace();
             } catch (Exception e) {
                 e.printStackTrace();
