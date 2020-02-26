@@ -19,16 +19,17 @@ public class ServerClientThread extends Thread {
 
         try  {
             Connection connection = new Connection(socket);
-            server.registrationUser(connection);
+            Server.registrationUser(connection);
             while(true) {
                 Message message = connection.receiveMessage();
                 if (message.getMessageType() == MessageType.TEXT) {
-                    server.sendBroadcastMessage(message);
+                    Server.sendBroadcastMessage(message);
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
+            System.out.println("Ошибка ClassNotFoundException");
             e.printStackTrace();
         }
     }

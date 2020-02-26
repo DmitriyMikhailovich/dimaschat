@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Server {
     private  boolean running = true;
-    protected ConcurrentHashMap<String, Connection> mapAllConnections = new ConcurrentHashMap<String, Connection>();
+    protected static ConcurrentHashMap<Connection, String> mapAllConnections = new ConcurrentHashMap<Connection, String>();
 
     public static void main(String[] args) {
         Server server = new Server();
@@ -26,21 +26,21 @@ public class Server {
         }
     }
 
-    protected void sendBroadcastMessage (Message message) throws IOException {
-        for (Connection connection: mapAllConnections.values()) {
+    protected static void sendBroadcastMessage (Message message) throws IOException {
+        for (Connection connection: mapAllConnections.keySet()) {
             connection.sendMessage(message);
             ConsoleHelper.writeMessage(message.getMessage());
         }
     }
 
-    protected void registrationUser (Connection connection) throws IOException, ClassNotFoundException {
+    protected static void registrationUser (Connection connection) throws IOException, ClassNotFoundException {
         connection.sendMessage(new Message("Введите имя пользователя: ",  MessageType.USER_REGISTRATION));
         while (true) {
             Message message = connection.receiveMessage();
             String name;
             if ((name = message.getMessage()) != null && message.getMessageType() == MessageType.USER_REGISTRATION) {
-                if (!mapAllConnections.containsKey(name)) {
-                    mapAllConnections.put(name, connection);
+                if (!mapAllConnections.containsValue(name)) {
+                    mapAllConnections.put(connection, name);
                     connection.sendMessage(new Message("Регистрация пользователя произошла успешно", MessageType.USER_REGISTRATION_SUCCESSFUL));
                     return;
                 } else {
@@ -49,6 +49,8 @@ public class Server {
             }
         }
     }
+
+    
 
 
 }
