@@ -21,7 +21,8 @@ public class ClientReceiveThread extends Thread {
 
     @Override
     public void run() {
-        while (true) {
+
+        while (!Thread.currentThread().isInterrupted()) {
             try {
                 Message message = connection.receiveMessage();
                 if (message.getMessageType() == MessageType.TEXT) {
@@ -37,13 +38,11 @@ public class ClientReceiveThread extends Thread {
                     ConsoleHelper.writeMessage(message.getMessage());
                 }
             } catch (IOException e) {
-                ConsoleHelper.writeMessage("Ошибка соединения");
-                e.printStackTrace();
+
             } catch (ClassNotFoundException e) {
                 ConsoleHelper.writeMessage("Ошибка соединения, ClassNotFoundException");
-                e.printStackTrace();
             } catch (Exception e) {
-                e.printStackTrace();
+                ConsoleHelper.writeMessage("Неизвестная ошибка соединения");
             }
         }
     }

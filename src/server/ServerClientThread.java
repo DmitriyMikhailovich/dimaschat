@@ -5,20 +5,19 @@ import java.net.Socket;
 
 public class ServerClientThread extends Thread {
     private Socket socket;
-    private Server server;
-    private Connection connection;
-     ServerClientThread(Socket clientSocket, Server server) {
+    private Connection connectionClient;
+
+    ServerClientThread(Socket clientSocket) {
         this.socket = clientSocket;
-        this.server = server;
         setDaemon(true);
     }
 
     @Override
     public void run() {
-        ConsoleHelper.writeMessage("Установлено соединение с сервером");
+        ConsoleHelper.writeMessage("Установлено соединение с новым пользователем");
 
-        try  {
-            Connection connection = new Connection(socket);
+        try (Connection connection = new Connection(socket);) {
+            connectionClient = connection;
             Server.registrationUser(connection);
             while(true) {
                 Message message = connection.receiveMessage();
@@ -26,11 +25,14 @@ public class ServerClientThread extends Thread {
                     Server.sendBroadcastMessage(message);
                 }
             }
+
         } catch (IOException e) {
-            e.printStackTrace();
+            ConsoleHelper.writeMessage("Ошибка соединения");
         } catch (ClassNotFoundException e) {
-            System.out.println("Ошибка ClassNotFoundException");
-            e.printStackTrace();
+            ConsoleHelper.writeMessage("Ошибка");
+        } catch (Exception e) {
+            ConsoleHelper.writeMessage("Неизвестная ошибка");
         }
+        Server.disconnectUser(connectionClient);
     }
 }

@@ -3,6 +3,9 @@ package server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Server {
@@ -18,7 +21,7 @@ public class Server {
             int i = 0;
             while (server.running) {
                 Socket clientSocket = serverSocket.accept();    //ждем подключения клиента
-                ServerClientThread serverClientThread = new ServerClientThread(clientSocket, server);   //передаём подключение в другой потом и ждем следующего клиента
+                ServerClientThread serverClientThread = new ServerClientThread(clientSocket);   //передаём подключение в другой потом и ждем следующего клиента
                 serverClientThread.start();
             }
         } catch (IOException e) {
@@ -26,11 +29,15 @@ public class Server {
         }
     }
 
-    protected static void sendBroadcastMessage (Message message) throws IOException {
+    protected static void sendBroadcastMessage (Message message)  {
         for (Connection connection: mapAllConnections.keySet()) {
-            connection.sendMessage(message);
-            ConsoleHelper.writeMessage(message.getMessage());
+            try {
+                connection.sendMessage(message);
+            } catch (IOException e) {
+                ConsoleHelper.writeMessage("Ошибка отправки пользователям сообщений");
+            }
         }
+        ConsoleHelper.writeMessage(message.getMessage());
     }
 
     protected static void registrationUser (Connection connection) throws IOException, ClassNotFoundException {
@@ -42,12 +49,20 @@ public class Server {
                 if (!mapAllConnections.containsValue(name)) {
                     mapAllConnections.put(connection, name);
                     connection.sendMessage(new Message("Регистрация пользователя произошла успешно", MessageType.USER_REGISTRATION_SUCCESSFUL));
+                    sendBroadcastMessage(new Message("Пользователь " + name + " присоединился к беседе" , MessageType.TEXT));
                     return;
                 } else {
                     connection.sendMessage(new Message("Данное имя занято, введите другое:", MessageType.USER_REGISTRATION));
                 }
             }
         }
+    }
+
+
+    protected static void disconnectUser(Connection connection) {
+        String message = "Пользователь " + mapAllConnections.get(connection) + " вышел из чата";
+        mapAllConnections.remove(connection);
+        sendBroadcastMessage(new Message(message , MessageType.TEXT));
     }
 
 

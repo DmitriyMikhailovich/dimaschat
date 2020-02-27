@@ -13,7 +13,7 @@ public class Client {
     private int portServer;
     private Socket socket;
     private String name;
-    protected boolean connected = false;
+    protected static boolean connected = false;
 
     public static void main(String[] args) {
         Client client = new Client();
@@ -28,7 +28,7 @@ public class Client {
             }
         }
         client.run();
-
+        client.disconnect();
     }
 
     private void startToConnection() throws IOException {
@@ -41,7 +41,7 @@ public class Client {
 
     private void run() {
         try (Connection connection = new Connection(socket)) {
-            ConsoleHelper.writeMessage("Соединение установлено");
+            ConsoleHelper.writeMessage("Соединение с сервером установлено");
             ClientReceiveThread clientReceiveThread = new ClientReceiveThread(connection, this);
             clientReceiveThread.start();
             try {
@@ -49,20 +49,23 @@ public class Client {
                     Thread.sleep(1);
                 }
             } catch (InterruptedException e) {
-                ConsoleHelper.writeMessage("Ошибка");
+                ConsoleHelper.writeMessage("Ошибка соединения");
                 return;
             }
-            while (true) {
+            while (connected) {
                 String message = ConsoleHelper.readMessage();
                 if (message.equals("exit")) {
-                    break;
+                    clientReceiveThread.interrupt();
+                    connected = false;
+                } else {
+                    connection.sendMessage(new Message(name + ": " + message, MessageType.TEXT));
                 }
-                connection.sendMessage(new Message(name + ": " + message, MessageType.TEXT));
             }
-            disconnect();
+
         } catch (IOException e) {
             ConsoleHelper.writeMessage("Соединение не установлено");
         } catch (Exception e) {
+            ConsoleHelper.writeMessage("Неизвестная ошибка");
             e.printStackTrace();
         }
     }
